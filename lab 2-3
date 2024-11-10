@@ -1,0 +1,85 @@
+using System;
+using System.Linq;
+
+public class ArrayProcessor
+{
+    private int[] array;
+
+    public ArrayProcessor(int[] array)
+    {
+        this.array = array;
+    }
+
+  
+    public int CountNegativeElements()
+    {
+        return array.Count(x => x < 0);
+    }
+
+  
+    public int SumAfterMinAbsElement()
+    {
+        int minAbsIndex = Array.IndexOf(array, array.OrderBy(Math.Abs).FirstOrDefault());
+        if (minAbsIndex == -1 || minAbsIndex == array.Length - 1)
+        {
+            return 0; 
+        }
+
+        return array.Skip(minAbsIndex + 1).Sum();
+    }
+
+    public void DisplayResults()
+    {
+        Console.WriteLine($"Кількість від’ємних елементів: {CountNegativeElements()}");
+        Console.WriteLine($"Сума елементів після мінімального за модулем елемента: {SumAfterMinAbsElement()}");
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine("Виберіть спосіб заповнення масиву:");
+        Console.WriteLine("1 - Введення масиву з клавіатури");
+        Console.WriteLine("2 - Заповнення масиву випадковими числами");
+
+        int choice = GetValidInput("Ваш вибір: ", 1, 2);
+
+        int n = GetValidInput("Введіть розмір масиву (n): ", 1, 100);
+
+        int[] array;
+        if (choice == 1)
+        {
+            array = new int[n];
+            for (int i = 0; i < n; i++)
+            {
+                array[i] = GetValidInput($"Введіть елемент {i + 1}: ");
+            }
+        }
+        else
+        {
+            Random random = new Random();
+            array = Enumerable.Range(0, n).Select(_ => random.Next(-100, 101)).ToArray();
+            Console.WriteLine("Згенерований масив: " + string.Join(", ", array));
+        }
+
+        ArrayProcessor processor = new ArrayProcessor(array);
+        processor.DisplayResults();
+    }
+
+
+    private static int GetValidInput(string prompt, int minValue = int.MinValue, int maxValue = int.MaxValue)
+    {
+        int value;
+        while (true)
+        {
+            Console.Write(prompt);
+            if (int.TryParse(Console.ReadLine(), out value) && value >= minValue && value <= maxValue)
+            {
+                return value;
+            }
+            Console.WriteLine("Помилка! Введіть коректне ціле число.");
+        }
+    }
+}
+
