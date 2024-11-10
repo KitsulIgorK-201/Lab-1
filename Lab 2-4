@@ -1,0 +1,121 @@
+using System;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Оберіть спосіб введення матриці:");
+        Console.WriteLine("1. Ввести матрицю з клавіатури");
+        Console.WriteLine("2. Заповнити матрицю випадковими числами");
+
+        int choice = GetValidInput(1, 2);
+        int rows, cols;
+
+        Console.Write("Введіть кількість рядків матриці: ");
+        rows = GetValidInput(1, 100);
+        Console.Write("Введіть кількість стовпців матриці: ");
+        cols = GetValidInput(1, 100);
+
+        int[,] matrix;
+        if (choice == 1)
+        {
+            matrix = InputMatrixFromKeyboard(rows, cols);
+        }
+        else
+        {
+            matrix = GenerateRandomMatrix(rows, cols);
+        }
+
+        PrintMatrix(matrix);
+
+        (int minCount, int maxCount) = CountMinMaxOccurrences(matrix);
+        Console.WriteLine($"Кількість входжень мінімального елемента: {minCount}");
+        Console.WriteLine($"Кількість входжень максимального елемента: {maxCount}");
+    }
+
+    static int GetValidInput(int min, int max)
+    {
+        int result;
+        while (true)
+        {
+            Console.Write($"Введіть число від {min} до {max}: ");
+            if (int.TryParse(Console.ReadLine(), out result) && result >= min && result <= max)
+            {
+                return result;
+            }
+            Console.WriteLine("Некоректний ввід. Спробуйте ще раз.");
+        }
+    }
+
+    static int[,] InputMatrixFromKeyboard(int rows, int cols)
+    {
+        int[,] matrix = new int[rows, cols];
+
+        Console.WriteLine("Введіть елементи матриці:");
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                Console.Write($"Елемент [{i}, {j}]: ");
+                matrix[i, j] = GetValidInput(int.MinValue, int.MaxValue);
+            }
+        }
+
+        return matrix;
+    }
+
+    static int[,] GenerateRandomMatrix(int rows, int cols)
+    {
+        int[,] matrix = new int[rows, cols];
+        Random random = new Random();
+
+        Console.WriteLine("Сгенеровані елементи матриці:");
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                matrix[i, j] = random.Next(-100, 101);
+                Console.Write($"Елемент [{i}, {j}]: {matrix[i, j]}  ");
+            }
+            Console.WriteLine();
+        }
+
+        return matrix;
+    }
+
+    static void PrintMatrix(int[,] matrix)
+    {
+        Console.WriteLine("Матриця:");
+        for (int i = 0; i < matrix.GetLength(0); i++)
+        {
+            for (int j = 0; j < matrix.GetLength(1); j++)
+            {
+                Console.Write(matrix[i, j] + "\t");
+            }
+            Console.WriteLine();
+        }
+    }
+
+    static (int, int) CountMinMaxOccurrences(int[,] matrix)
+    {
+        int minElement = int.MaxValue;
+        int maxElement = int.MinValue;
+        int minCount = 0, maxCount = 0;
+
+        // Знаходимо мінімальний і максимальний елементи
+        foreach (var item in matrix)
+        {
+            if (item < minElement) minElement = item;
+            if (item > maxElement) maxElement = item;
+        }
+
+        // Підрахунок входжень
+        foreach (var item in matrix)
+        {
+            if (item == minElement) minCount++;
+            if (item == maxElement) maxCount++;
+        }
+
+        return (minCount, maxCount);
+    }
+}
